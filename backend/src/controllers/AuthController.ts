@@ -2,7 +2,8 @@ import { NextFunction, Response } from "express";
 import { AuthService } from "../services";
 import { AuthRequest } from "../types";
 import { validationResult } from "express-validator";
-import { HttpStatus } from "../utils/constant";
+import createHttpError from "http-errors";
+import { HttpStatus } from './../utils/constant';
 
 class AuthController {
     constructor(private authService: AuthService) { }
@@ -16,6 +17,10 @@ class AuthController {
             }
 
             const registeredUser = await this.authService.register(req.body);
+            if (!registeredUser) {
+                next(createHttpError(HttpStatus.BAD_REQUEST, "Email already exists."))
+                return;
+            }
 
             res.status(HttpStatus.CREATED).json({
                 message: "User registered successfully.",

@@ -30,17 +30,13 @@ app.get("/api/v1/health", (req: Request, res: Response) => {
 app.use((err: HttpError, req: Request, res: Response, _next: NextFunction) => {
     const statusCode = err.statusCode || err.status || 500;
     res.status(statusCode).json({
-        errors: [
-            {
-                statusCode,
-                type: err.name,
-                msg: err.message,
-                url: req.url,
-                ip: req.ip,
-                success: false,
-                stack: Config.NODE_ENV === 'production' ? null : err.stack,
-            },
-        ],
+        statusCode,
+        type: err.name,
+        message: err.message,
+        url: req.url,
+        ip: req.ip,
+        success: false,
+        stack: Config.NODE_ENV === 'production' ? null : err.stack,
     });
 });
 export default app;
