@@ -89,8 +89,6 @@ describe('POST /api/v1/auth/register', () => {
             password: 'AnotherPass123',
         });
 
-        console.log(JSON.stringify(res.body));
-
         expect(res.statusCode).toBe(400); // or 409 depending on your error handling
         expect(res.body.message?.toLowerCase()).toContain('exists');
     });
