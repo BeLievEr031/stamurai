@@ -1,9 +1,9 @@
-import { User } from "../models";
-import { IUser } from "../types";
+import { RefreshToken, User } from "../models";
+import { IRefreshToken, IUser } from "../types";
 import { comparePassword } from "../utils";
 
 class AuthService {
-    constructor(private userRepo: typeof User) { }
+    constructor(private userRepo: typeof User, private refreshTokenRepo: typeof RefreshToken) { }
 
     async register(user: IUser) {
         const isUser = await this.userRepo.findOne({ email: user.email })
@@ -26,6 +26,10 @@ class AuthService {
         }
 
         return isUser;
+    }
+
+    async persistRefreshToken(data: IRefreshToken) {
+        return this.refreshTokenRepo.create(data);
     }
 }
 

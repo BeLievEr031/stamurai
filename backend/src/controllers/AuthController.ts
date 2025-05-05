@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { NextFunction, Response } from "express";
 import { AuthService } from "../services";
 import { AuthRequest, IPayload } from "../types";
@@ -56,8 +57,12 @@ class AuthController {
 
             // Generate access and refresh token
             const accessToken = generateAccessToken(payload);
-
             const refreshToken = generateRefreshToken(payload);
+
+            await this.authService.persistRefreshToken({
+                userid: new mongoose.Types.ObjectId(user._id as string),
+                token: refreshToken
+            });
 
             res.cookie("accessToken", accessToken, {
                 httpOnly: true,

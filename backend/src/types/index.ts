@@ -1,3 +1,3 @@
-import { IUser, AuthRequest, IPayload } from "./user"
+import { IUser, AuthRequest, IPayload, IRefreshToken } from "./user"
 
-export { IUser, AuthRequest, IPayload };
+export { IUser, AuthRequest, IPayload, IRefreshToken };
