@@ -1,9 +1,11 @@
 import { Request, NextFunction, Response, Router } from "express";
+import { Request as AuthenticatRequest } from "express-jwt";
 import { AuthService } from "../../services";
 import { RefreshToken, User } from "../../models";
 import { AuthController } from "../../controllers";
 import { loginValidator, registerValidator } from "../../validators";
 import { AuthRequest } from "../../types";
+import authenticate from "../../middleware/authenticate";
 
 const authRouter = Router();
 const authService = new AuthService(User, RefreshToken)
@@ -12,5 +14,7 @@ const authController = new AuthController(authService);
 authRouter.post("/register", registerValidator, (req: Request, res: Response, next: NextFunction) => authController.register(req as AuthRequest, res, next))
 
 authRouter.post("/login", loginValidator, (req: Request, res: Response, next: NextFunction) => authController.login(req as AuthRequest, res, next))
+
+authRouter.post("/self", authenticate, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.self(req, res, next))
 
 export default authRouter;

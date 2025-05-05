@@ -6,6 +6,7 @@ import { validationResult } from "express-validator";
 import createHttpError from "http-errors";
 import { HttpStatus } from './../utils/constant';
 import { generateAccessToken, generateRefreshToken } from "../utils";
+import { Request as AuthenticateRequest } from 'express-jwt';
 
 class AuthController {
     constructor(private authService: AuthService) { }
@@ -81,6 +82,19 @@ class AuthController {
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: 'User logged in successfully.',
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async self(req: AuthenticateRequest, res: Response, next: NextFunction) {
+        try {
+            const user = await this.authService.self(req.auth?._id)
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: "User data fetched.",
+                user
             })
         } catch (error) {
             next(error)

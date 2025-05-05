@@ -31,6 +31,10 @@ class AuthService {
     async persistRefreshToken(data: IRefreshToken) {
         return this.refreshTokenRepo.create(data);
     }
+
+    async self(_id: string) {
+        return await this.userRepo.findById(_id).select("-password")
+    }
 }
 
 export default AuthService;

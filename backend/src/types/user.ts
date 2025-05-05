@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { Request } from "express-jwt";
 import mongoose, { Document } from "mongoose";
 export interface IUser extends Document {
     email: string;
@@ -22,3 +22,4 @@ export interface IRefreshToken {
     userid: mongoose.Types.ObjectId;
     token: string;
 }
+
