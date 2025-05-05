@@ -20,7 +20,12 @@ const userSchema = new Schema<IUser>({
     password: {
         type: String,
         required: [true, "Password must be given."]
-    }
+    },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user"
+    },
 }, {
     timestamps: true
 })
