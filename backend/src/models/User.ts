@@ -1,5 +1,7 @@
 import { model, Schema } from "mongoose"
 import { IUser } from "../types"
+import { hashPassword } from "../utils"
+import logger from "../config/logger";
 
 const userSchema = new Schema<IUser>({
     email: {
@@ -23,6 +25,15 @@ const userSchema = new Schema<IUser>({
     timestamps: true
 })
 
-const User = model("User", userSchema)
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    try {
+        this.password = await hashPassword(this.password) as string;
+        next();
+    } catch (error) {
+        logger.error(error)
+    }
+});
 
+const User = model("User", userSchema)
 export default User;
