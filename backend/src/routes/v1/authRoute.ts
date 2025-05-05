@@ -15,6 +15,6 @@ authRouter.post("/register", registerValidator, (req: Request, res: Response, ne
 
 authRouter.post("/login", loginValidator, (req: Request, res: Response, next: NextFunction) => authController.login(req as AuthRequest, res, next))
 
-authRouter.post("/self", authenticate, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.self(req, res, next))
+authRouter.get("/self", authenticate, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.self(req, res, next))
 
 export default authRouter;
