@@ -1,2 +1,7 @@
 import { registerValidator, loginValidator } from "./authValidator"
-export { registerValidator, loginValidator };
+import { addTaskValidator, updateTaskValidator, deleteTaskValidator, paginationQueryValidator } from './taskValidator';
+
+export {
+    registerValidator, loginValidator,
+    addTaskValidator, updateTaskValidator, deleteTaskValidator, paginationQueryValidator
+};

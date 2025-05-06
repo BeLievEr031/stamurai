@@ -1,4 +1,4 @@
 import User from "./User";
 import RefreshToken from "./RefreshToken"
-
-export { User, RefreshToken }
+import Task from "./Task"
+export { User, RefreshToken, Task }

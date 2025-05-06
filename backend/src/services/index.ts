@@ -1,3 +1,3 @@
 import AuthService from "./AuthService";
-
-export { AuthService };
+import TaskService from "./TaskService"
+export { AuthService, TaskService };
