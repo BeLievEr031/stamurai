@@ -23,7 +23,7 @@ export const generateAccessToken = (payload: IPayload) => {
     return jwt.sign(payload, Config.ACCESS_TOKEN_SECRET!, {
         algorithm: "HS256",
         issuer: "stamrai-backend",
-        jwtid: payload._id,
+        jwtid: payload.userid,
         expiresIn: "1h"
     })
 }
@@ -31,7 +31,7 @@ export const generateRefreshToken = (payload: IPayload) => {
     return jwt.sign(payload, Config.REFRESH_TOKEN_SECRET!, {
         algorithm: "HS256",
         issuer: "stamrai-backend",
-        jwtid: payload._id,
+        jwtid: payload.userid,
         expiresIn: "7d"
     })
 }

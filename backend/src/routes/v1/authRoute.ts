@@ -6,6 +6,7 @@ import { AuthController } from "../../controllers";
 import { loginValidator, registerValidator } from "../../validators";
 import { AuthRequest } from "../../types";
 import authenticate from "../../middleware/authenticate";
+import validateRefreshToken from "../../middleware/validateRefreshToken";
 
 const authRouter = Router();
 const authService = new AuthService(User, RefreshToken)
@@ -17,4 +18,5 @@ authRouter.post("/login", loginValidator, (req: Request, res: Response, next: Ne
 
 authRouter.get("/self", authenticate, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.self(req, res, next))
 
+authRouter.post("/refresh", validateRefreshToken, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.refresh(req, res, next))
 export default authRouter;

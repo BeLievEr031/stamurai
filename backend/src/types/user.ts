@@ -8,7 +8,7 @@ export interface IUser extends Document {
 }
 
 export interface IPayload {
-    _id: string;
+    userid: string;
     email: string;
     name: string;
     role: string;

@@ -50,7 +50,7 @@ class AuthController {
             }
 
             const payload: IPayload = {
-                _id: String(user._id),
+                userid: String(user._id),
                 email: user.email,
                 name: user.name,
                 role: "user"
@@ -90,11 +90,61 @@ class AuthController {
 
     async self(req: AuthenticateRequest, res: Response, next: NextFunction) {
         try {
-            const user = await this.authService.self(req.auth?._id)
+            const user = await this.authService.self(req.auth?.userid)
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: "User data fetched.",
                 user
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async refresh(req: AuthenticateRequest, res: Response, next: NextFunction) {
+        try {
+            const { userid, email, name, role } = (req.auth as IPayload)
+
+            const payload: IPayload = {
+                userid,
+                email,
+                name,
+                role
+            }
+
+            // Generate access and refresh token
+            const accessToken = generateAccessToken(payload);
+            const refreshToken = generateRefreshToken(payload);
+
+            // Delete Prev token
+            const isDeleted = await this.authService.deleteRefreshToken(userid)
+
+            if (!isDeleted) {
+                next(createHttpError(HttpStatus.UNAUTHORIZED, "Invalid refresh token."));
+            }
+
+            await this.authService.persistRefreshToken({
+                userid: new mongoose.Types.ObjectId(userid),
+                token: refreshToken
+            });
+
+            res.cookie("accessToken", accessToken, {
+                httpOnly: true,
+                maxAge: 1000 * 60 * 60,
+                secure: true,
+                sameSite: "strict"
+            })
+
+            res.cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                maxAge: 1000 * 60 * 60 * 24 * 7,
+                secure: true,
+                sameSite: "strict"
+            })
+
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: 'Token refreshed successfully.',
             })
         } catch (error) {
             next(error)

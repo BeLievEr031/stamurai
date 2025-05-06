@@ -32,6 +32,10 @@ class AuthService {
         return this.refreshTokenRepo.create(data);
     }
 
+    async deleteRefreshToken(userid: string) {
+        return this.refreshTokenRepo.findOneAndDelete({ userid })
+    }
+
     async self(_id: string) {
         return await this.userRepo.findById(_id).select("-password")
     }
