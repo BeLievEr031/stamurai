@@ -4,6 +4,7 @@ import { AddTaskRequest, DeleteTaskRequest, EditTaskRequest, IPayload, Paginatio
 import { validationResult } from "express-validator";
 import { HttpStatus } from "../utils/constant";
 import createHttpError from "http-errors";
+import logger from "../config/logger";
 
 class TaksController {
     constructor(private taskService: TaskService) { }
@@ -32,6 +33,7 @@ class TaksController {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
+                logger.error(JSON.stringify({ errors: errors.array() }))
                 res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
                 return;
             }
@@ -40,10 +42,10 @@ class TaksController {
             const task = await this.taskService.update(id, req.body)
 
             if (!task) {
-                next(createHttpError(HttpStatus.BAD_REQUEST, "Invalid task."))
+                next(createHttpError(HttpStatus.NOT_FOUND, "Invalid task."))
             }
 
-            res.status(HttpStatus.CREATED).json({
+            res.status(HttpStatus.OK).json({
                 success: true,
                 message: "Taks Updated successfully.",
                 task
