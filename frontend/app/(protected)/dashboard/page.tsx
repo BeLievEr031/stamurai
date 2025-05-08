@@ -3,14 +3,13 @@
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { CalendarIcon, FlagIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { CalendarIcon, FlagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
-import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-// import { cn } from "@/lib/utils";
+import TaskTable from "@/components/ui/TaskTable";
 
 const mockTasks = [
     {
@@ -37,13 +36,40 @@ const mockTasks = [
         dueDate: "2024-06-01",
         avatar: "/avatar3.png",
     },
+    {
+        id: 4,
+        title: "Fix bug #234",
+        priority: "High",
+        status: "Overdue",
+        dueDate: "2024-06-01",
+        avatar: "/avatar3.png",
+    },
+    {
+        id: 5,
+        title: "Fix bug #234",
+        priority: "High",
+        status: "Overdue",
+        dueDate: "2024-06-01",
+        avatar: "/avatar3.png",
+    },
+
+    {
+        id: 6,
+        title: "Fix bug #234",
+        priority: "High",
+        status: "Overdue",
+        dueDate: "2024-06-01",
+        avatar: "/avatar3.png",
+    },
+
+
 ];
 
 export default function DashboardPage() {
     const [selectedDate, setSelectedDate] = useState<Date>();
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 h-screen overflow-scroll">
             {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
@@ -97,7 +123,8 @@ export default function DashboardPage() {
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button variant="outline" className="justify-start">
-                            {selectedDate ? format(selectedDate, "yyyy-MM-dd") : "Any date"}
+                            {/* {selectedDate ? format(selectedDate, "yyyy-MM-dd") : "Any date"} */}
+                            Any Date
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                     </PopoverTrigger>
@@ -116,30 +143,7 @@ export default function DashboardPage() {
                 </TabsList>
 
                 <TabsContent value="assigned">
-                    <div className="divide-y border mt-4">
-                        {mockTasks.map((task) => (
-                            <div key={task.id} className="flex items-center justify-between p-4">
-                                <div className="flex items-center gap-3">
-                                    <FlagIcon className="h-4 w-4" />
-                                    <div>
-                                        <div className="font-medium">{task.title}</div>
-                                        <div className="text-xs text-muted-foreground">{task.priority}</div>
-                                    </div>
-                                </div>
-                                <div className="text-sm">{task.status}</div>
-                                <div className="text-sm">{task.dueDate}</div>
-                                <div className="flex items-center gap-2">
-                                    <Button size="icon" variant="ghost">
-                                        <PencilIcon className="w-4 h-4 cursor-pointer" />
-
-                                    </Button>
-                                    <Button size="icon" variant="ghost">
-                                        <TrashIcon className="w-4 h-4 cursor-pointer" />
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <TaskTable task={mockTasks} />
                 </TabsContent>
 
                 <TabsContent value="created">
@@ -151,5 +155,6 @@ export default function DashboardPage() {
                 </TabsContent>
             </Tabs>
         </div>
+
     );
 }

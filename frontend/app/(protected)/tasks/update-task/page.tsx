@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, FlagIcon, UserIcon } from "lucide-react";
+import { CalendarIcon, FlagIcon, } from "lucide-react";
 import {
     Form,
     FormControl,
@@ -16,9 +16,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSearchParams } from "next/navigation";
 
 const taskSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
@@ -36,6 +36,12 @@ const taskSchema = z.object({
 type TaskFormValues = z.infer<typeof taskSchema>;
 
 export default function UpdateTask() {
+    const searchParam = useSearchParams()
+    const taskid = searchParam.get("taskid")
+    console.log(taskid);
+
+    // To backend call and fetch task data for update
+
     const form = useForm<TaskFormValues>({
         resolver: zodResolver(taskSchema),
         defaultValues: {
@@ -55,7 +61,7 @@ export default function UpdateTask() {
 
     return (
         <div className="max-w-2xl mx-auto p-6">
-            <h1 className="text-2xl font-semibold mb-6">Create Task</h1>
+            <h1 className="text-2xl font-semibold mb-6">Update Task</h1>
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -91,22 +97,6 @@ export default function UpdateTask() {
                         />
 
                         <div className="grid grid-cols-2 gap-4 mt-6">
-                            <FormField
-                                control={form.control}
-                                name="assignerid"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Assignee</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Input placeholder="Select team member" {...field} />
-                                                <UserIcon className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
 
                             <FormField
                                 control={form.control}
@@ -124,7 +114,8 @@ export default function UpdateTask() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {field.value ? format(field.value, "yyyy-MM-dd") : "Select date"}
+                                                        {/* {field.value ? format(field.value, "yyyy-MM-dd") : "Select date"} */}
+                                                        Select date
                                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </FormControl>
@@ -193,7 +184,7 @@ export default function UpdateTask() {
                     </div>
 
                     <div className="flex gap-2 mt-6">
-                        <Button type="submit" className="bg-black text-white">Create Task</Button>
+                        <Button type="submit" className="bg-black text-white">Update Task</Button>
                         <Button variant="ghost" type="button">Cancel</Button>
                     </div>
                 </form>

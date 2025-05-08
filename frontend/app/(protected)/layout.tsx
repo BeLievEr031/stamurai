@@ -59,7 +59,7 @@ export default function DashboardLayout({
                             {!collapsed && <span>Tasks</span>}
                         </Link>
 
-                        <Link href="/dashboard/team" className={cn(
+                        <Link href="/teams" className={cn(
                             "flex items-center p-3 rounded-lg hover:bg-blue-50",
                             collapsed ? "justify-center" : "space-x-3"
                         )}>

@@ -4,106 +4,135 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, FilterIcon, Flag, FlagIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { CalendarIcon, FlagIcon, } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import TaskTable from "@/components/ui/TaskTable";
+import { useRouter } from "next/navigation";
+
+const mockTasks = [
+    {
+        id: 1,
+        title: "Design login page",
+        priority: "High",
+        status: "In Progress",
+        dueDate: "2024-06-10",
+        avatar: "/avatar1.png",
+    },
+    {
+        id: 2,
+        title: "Update API docs",
+        priority: "Medium",
+        status: "To Do",
+        dueDate: "2024-06-12",
+        avatar: "/avatar2.png",
+    },
+    {
+        id: 3,
+        title: "Fix bug #234",
+        priority: "High",
+        status: "Overdue",
+        dueDate: "2024-06-01",
+        avatar: "/avatar3.png",
+    },
+    {
+        id: 4,
+        title: "Fix bug #234",
+        priority: "High",
+        status: "Overdue",
+        dueDate: "2024-06-01",
+        avatar: "/avatar3.png",
+    },
+    {
+        id: 5,
+        title: "Fix bug #234",
+        priority: "High",
+        status: "Overdue",
+        dueDate: "2024-06-01",
+        avatar: "/avatar3.png",
+    },
+    {
+        id: 6,
+        title: "Fix bug #234",
+        priority: "High",
+        status: "Overdue",
+        dueDate: "2024-06-01",
+        avatar: "/avatar3.png",
+    },
+];
 
 export default function TasksPage() {
-    const [date, setDate] = useState<Date | undefined>();
     const router = useRouter();
+    const [selectedDate, setSelectedDate] = useState<Date>();
+
     return (
-        <div className="p-6">
+        <div className="p-6 space-y-6">
             <h2 className="text-2xl font-semibold mb-4">Tasks</h2>
 
             <div className="flex justify-between items-center mb-4">
                 <Button className="bg-black text-white cursor-pointer" onClick={() => router.push('/tasks/create-task')}>New Task</Button>
             </div>
 
-            <div className="grid grid-cols-4 gap-4 mb-6">
-                <Input placeholder="Search by title or description" className="col-span-1" />
+            {/* Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Input placeholder="Search by title or description" />
 
-                <div className="relative">
-                    <Input placeholder="All statuses" className="pr-8" />
-                    <FilterIcon className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                </div>
+                <Select>
+                    <SelectTrigger>
+                        <SelectValue placeholder="All statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                    </SelectContent>
+                </Select>
 
-                <div className="relative">
-                    <Input placeholder="All priorities" className="pr-8" />
-                    <FlagIcon className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                </div>
-
+                <Select>
+                    <SelectTrigger>
+                        <SelectValue placeholder="All priorities" />
+                        <FlagIcon className="ml-2 h-4 w-4 text-muted-foreground" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                </Select>
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal"
-                        >
-                            <span>Any date</span>
+                        <Button variant="outline" className="justify-start">
+                            {/* {selectedDate ? format(selectedDate, "yyyy-MM-dd") : "Any date"}
+                             */}
+                            Any Date
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                        <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                        <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
                     </PopoverContent>
                 </Popover>
             </div>
 
+            {/* Tabs and Tasks */}
             <Tabs defaultValue="assigned">
-                <TabsList className="mb-4">
+                <TabsList className="mt-4">
                     <TabsTrigger value="assigned">Assigned to Me</TabsTrigger>
                     <TabsTrigger value="created">Created by Me</TabsTrigger>
                     <TabsTrigger value="overdue">Overdue</TabsTrigger>
                 </TabsList>
+
                 <TabsContent value="assigned">
-                    <div className="border rounded-lg">
-                        <div className="grid grid-cols-6 gap-4 px-4 py-2 font-medium border-b">
-                            <div className="col-span-2">Title</div>
-                            <div>Status</div>
-                            <div>Priority</div>
-                            <div>Due Date</div>
-                            <div className="text-right">Actions</div>
-                        </div>
-                        {[
-                            {
-                                title: "Design login page",
-                                status: "In Progress",
-                                priority: "High",
-                                due: "2024-06-10",
-                                avatar: "/avatar1.jpg"
-                            },
-                            {
-                                title: "Update API docs",
-                                status: "To Do",
-                                priority: "Medium",
-                                due: "2024-06-12",
-                                avatar: "/avatar2.jpg"
-                            },
-                            {
-                                title: "Fix bug #234",
-                                status: "Overdue",
-                                priority: "High",
-                                due: "2024-06-01",
-                                avatar: "/avatar3.jpg"
-                            }
-                        ].map((task, idx) => (
-                            <div
-                                key={idx}
-                                className="grid grid-cols-6 gap-4 px-4 py-3 items-center border-b"
-                            >
-                                <div className="flex items-center col-span-2 gap-2">
-                                    <Flag size={15} color={task.priority == "High" ? "red" : task.priority == "Low" ? "green" : "Yellow"} />
-                                    <span>{task.title}</span>
-                                </div>
-                                <div>{task.priority}</div>
-                                <div>{task.status}</div>
-                                <div>{task.due}</div>
-                                <div className="flex justify-end gap-2">
-                                    <PencilIcon className="w-4 h-4 cursor-pointer" />
-                                    <TrashIcon className="w-4 h-4 cursor-pointer" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <TaskTable task={mockTasks} />
+                </TabsContent>
+
+                <TabsContent value="created">
+                    <p className="text-muted-foreground mt-4">Created tasks go here...</p>
+                </TabsContent>
+
+                <TabsContent value="overdue">
+                    <p className="text-muted-foreground mt-4">Overdue tasks go here...</p>
                 </TabsContent>
             </Tabs>
         </div>

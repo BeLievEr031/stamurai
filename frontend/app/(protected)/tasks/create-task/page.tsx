@@ -16,7 +16,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -124,7 +123,9 @@ export default function CreateTask() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {field.value ? format(field.value, "yyyy-MM-dd") : "Select date"}
+                                                        {/* {field.value ? format(field.value, "yyyy-MM-dd") : "Select date"} */}
+                                                        Select date
+
                                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </FormControl>
