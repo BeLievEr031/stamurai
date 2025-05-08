@@ -5,7 +5,7 @@ export const registerUser = async (data: IUser) => api.post("/auth/register", da
 export const loginUser = async (data: IUser) => api.post("/auth/login", data)
 export const self = async () => api.get("/auth/self")
 export const refreshToken = async () => api.post("/auth/refresh")
-
+export const logout = async () => api.delete("/auth/logout")
 
 // Api for the tasks
 export const createTask = async (data: ITask) => api.post("/task", data)
@@ -17,3 +17,4 @@ export const getSingleTask = async (id: string) => api.get(`/task/single-task/${
 export const updateTask = async (task: { taskid: string, data: ITask }) => api.put(`/task/${task.taskid}`, task.data)
 
 export const getStat = async () => api.get("/task/stat")
+

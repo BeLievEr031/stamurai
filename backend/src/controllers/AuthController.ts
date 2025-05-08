@@ -88,6 +88,21 @@ class AuthController {
         }
     }
 
+    async logout(req: AuthenticateRequest, res: Response, next: NextFunction) {
+        try {
+            const { userid } = req.auth as IPayload;
+            await this.authService.logout(userid)
+            res.clearCookie("accessToken")
+            res.clearCookie("refreshToken")
+
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: "User logout successfully."
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
     async self(req: AuthenticateRequest, res: Response, next: NextFunction) {
         try {
             const user = await this.authService.self(req.auth?.userid)

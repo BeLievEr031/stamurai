@@ -1,6 +1,5 @@
 // stores/useAuthStore.ts
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware'
 interface User {
     userid: string;
     name: string;
@@ -11,11 +10,13 @@ interface User {
 interface AuthState {
     user: User | null;
     setUser: (user: User) => void;
+    logout: () => void
 }
 
 export const useAuthStore = create<AuthState>(
-    devtools((set) => ({
+    (set) => ({
         user: null,
         setUser: (user) => set({ user }),
-    }))
+        logout: () => set({ user: null }),
+    })
 );

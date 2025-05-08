@@ -18,5 +18,8 @@ authRouter.post("/login", loginValidator, (req: Request, res: Response, next: Ne
 
 authRouter.get("/self", authenticate, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.self(req, res, next))
 
+authRouter.delete("/logout", authenticate, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.logout(req, res, next))
+
 authRouter.post("/refresh", validateRefreshToken, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.refresh(req, res, next))
 export default authRouter;
+

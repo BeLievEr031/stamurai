@@ -39,6 +39,10 @@ class AuthService {
     async self(_id: string) {
         return await this.userRepo.findById(_id).select("-password")
     }
+
+    async logout(userid: string) {
+        return this.refreshTokenRepo.findOneAndDelete({ userid })
+    }
 }
 
 export default AuthService;

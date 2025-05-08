@@ -8,12 +8,15 @@ import {
     Bell,
     // Settings,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    LogOut
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/useAuthStore'
+import { useMutation } from '@tanstack/react-query'
+import { logout } from '@/http/api'
 
 export default function DashboardLayout({
     children,
@@ -23,7 +26,7 @@ export default function DashboardLayout({
 
     const [collapsed, setCollapsed] = useState(false)
     const router = useRouter()
-    const { user } = useAuthStore();
+    const { user, logout: userLogout } = useAuthStore();
 
     useEffect(() => {
         console.log(user);
@@ -31,6 +34,14 @@ export default function DashboardLayout({
             router.push("/login")
         }
     }, [router, user])
+
+    const { mutate } = useMutation({
+        mutationKey: ['logout'],
+        mutationFn: logout,
+        onSuccess: () => {
+            userLogout();
+        }
+    })
 
     return (
         <div className="flex h-screen bg-gray-50">
@@ -90,20 +101,20 @@ export default function DashboardLayout({
                     </nav>
 
                     {/* Profile */}
-                    <div className={cn(
+                    {/* <div className={cn(
                         "mt-auto pt-4 border-t flex items-center",
                         collapsed ? "flex-col justify-center" : "space-x-3"
                     )}>
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
-                            AM
-                        </div>
                         {!collapsed && (
                             <div>
-                                <p className="font-medium">Alex Morgan</p>
-                                <p className="text-xs text-gray-500">Product Manager</p>
+                                <p className="font-medium">{user?.name}</p>
                             </div>
                         )}
-                    </div>
+                    </div> */}
+                    <Button className='cursor-pointer' onClick={() => mutate()}>
+                        <LogOut className="text-gray-600" size={20} />
+                        {!collapsed && <span>Logout</span>}
+                    </Button>
                 </div>
             </div>
 
