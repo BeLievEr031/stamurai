@@ -35,6 +35,7 @@ export interface IPagination {
     status?: string;
     priority?: string;
     dueData?: string;
+    tab?: string;
 }
 
 export interface PaginationRequest extends Request {

@@ -13,3 +13,14 @@ export interface ITask {
     status: 'pending' | 'in-progress' | 'completed';
     assignerid?: string
 }
+
+export interface IPagination {
+    page: string;
+    limit: string;
+    title?: string;
+    description?: string;
+    status?: string;
+    priority?: string;
+    dueData?: string;
+    tab?: string;
+}

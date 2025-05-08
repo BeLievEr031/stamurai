@@ -15,6 +15,12 @@ export const addTaskValidator = checkSchema({
             errorMessage: 'Title must be at least 3 characters long',
         },
     },
+    tab: {
+        in: ['body'],
+        isString: true,
+        trim: true,
+    },
+
     description: {
         in: ['body'],
         isString: true,
@@ -46,12 +52,13 @@ export const addTaskValidator = checkSchema({
             errorMessage: 'Status must be one of: pending, in-progress, completed',
         },
     },
+
     assignerid: {
         in: ['body'],
         optional: true,
-        isMongoId: true,
-        errorMessage: 'Assigner ID must be a valid Mongo ID',
-    },
+        isString: true,
+        trim: true,
+    }
 });
 
 export const updateTaskValidator = checkSchema({
@@ -159,7 +166,7 @@ export const paginationQueryValidator = checkSchema({
         in: ['query'],
         optional: true,
         isIn: {
-            options: [['pending', 'in-progress', 'completed']],
+            options: [['all', 'pending', 'in-progress', 'completed']],
             errorMessage: 'Invalid status value',
         },
     },
@@ -167,7 +174,7 @@ export const paginationQueryValidator = checkSchema({
         in: ['query'],
         optional: true,
         isIn: {
-            options: [['low', 'medium', 'high']],
+            options: [['all', 'low', 'medium', 'high']],
             errorMessage: 'Invalid priority value',
         },
     },

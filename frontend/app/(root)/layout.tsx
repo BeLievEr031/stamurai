@@ -13,15 +13,14 @@ function RootLayout({ children }: {
     useEffect(() => {
         async function fetchData() {
             const selfData = await fetchUser();
-            console.log(selfData);
-            const userid = selfData?.data?.data.user._id;
-            setUser({ userid, ...selfData?.data?.data.user });
+            console.log(selfData?.data?.data.user);
+            setUser(selfData?.data?.data.user);
         }
         fetchData();
     }, [fetchUser, setUser])
 
     useEffect(() => {
-        if (user) {
+        if (user !== undefined && user) {
             router.push("/dashboard")
         } else {
             router.push("/register")

@@ -59,7 +59,10 @@ export default function CreateTask() {
 
     function onSubmit(data: TaskFormValues) {
         if (user?.userid) {
-            const task = { ...data, assignerid: user.userid, userid: user.userid, }
+            if (data.assignerid === "") {
+                delete data.assignerid
+            }
+            const task = { ...data, userid: user.userid, }
             createTaskMutate(task)
         }
     }

@@ -10,8 +10,10 @@ import { FlagIcon, PencilIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import React from 'react'
+import { format } from "date-fns";
 
 interface Task {
+    _id: string;
     id: string | number,
     title: string,
     priority: string,
@@ -35,18 +37,20 @@ function TaskTable({ task }: IProp) {
                         <TableHead className="w-[20%] text-right">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody key={Date.now()}>
                     {task.map((task) => (
-                        <TableRow key={task.id}>
+                        <TableRow key={task._id}>
                             <TableCell className="flex items-center gap-3">
                                 <FlagIcon className="h-4 w-4 text-muted-foreground" />
                                 <div>
                                     <div className="font-medium">{task.title}</div>
-                                    <div className="text-xs text-muted-foreground">{task.priority}</div>
+                                    <div className="text-xs text-muted-foreground capitalize">{task.priority}</div>
                                 </div>
                             </TableCell>
-                            <TableCell>{task.status}</TableCell>
-                            <TableCell>{task.dueDate}</TableCell>
+                            <TableCell className="capitalize">{task.status}</TableCell>
+                            <TableCell>
+                                {format(task.dueDate, 'MMMM dd, yyyy')}
+                            </TableCell>
                             <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
                                     <Button size="icon" variant="ghost">

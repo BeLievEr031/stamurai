@@ -1,4 +1,3 @@
-import logger from "../config/logger";
 import { Task } from "../models";
 import { IPagination, ITask } from "../types";
 
@@ -29,6 +28,7 @@ class TaskServcie {
             dueData,
             priority,
             status,
+            tab
         } = query;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,26 +43,85 @@ class TaskServcie {
             filters.description = { $regex: description, $options: 'i' };
         }
 
-        if (priority) {
+        if (priority && priority !== "all") {
             filters.priority = priority;
         }
 
-        if (status) {
+        if (status && status !== "all") {
             filters.status = status;
         }
 
         if (dueData) {
-            filters.dueDate = new Date(dueData); // you may add more precise date matching if needed
+            filters.dueDate = new Date(dueData);
         }
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
-        logger.info(JSON.stringify(filters))
-        const tasks = await this.taskRepo.find(filters)
-            .skip(skip)
-            .limit(parseInt(limit))
-            .sort({ createdAt: -1 }); // optional: sort by creation date desc
+        let tasks = null;
 
-        const total = await this.taskRepo.countDocuments(filters);
+        let total = 0
+
+
+        if (tab === "all") {
+            tasks = await this.taskRepo.find(filters)
+                .skip(skip)
+                .limit(parseInt(limit))
+                .sort({ createdAt: -1 });
+            total = await this.taskRepo.countDocuments(filters);
+        }
+
+        if (tab === "assigned") {
+            tasks = await this.taskRepo.find({
+                ...filters, $or: [
+                    { assignerid: { $exists: true } },
+                    { assignerid: { $ne: null } }
+                ]
+            })
+                .skip(skip)
+                .limit(parseInt(limit))
+                .sort({ createdAt: -1 });
+
+            total = await this.taskRepo.countDocuments({
+                ...filters, $or: [
+                    { assignerid: { $exists: true } },
+                    { assignerid: { $ne: null } }
+                ]
+            });
+        }
+
+        if (tab === 'created') {
+            tasks = await this.taskRepo.find({
+                ...filters, $or: [
+                    { assignerid: { $exists: false } },
+                    { assignerid: null }
+                ]
+            })
+                .skip(skip)
+                .limit(parseInt(limit))
+                .sort({ createdAt: -1 });
+            total = await this.taskRepo.countDocuments({
+                ...filters, $or: [
+                    { assignerid: { $exists: false } },
+                    { assignerid: null }
+                ]
+            });
+        }
+
+        if (tab === 'overdue') {
+            const now = new Date();
+            tasks = await this.taskRepo.find({
+                ...filters,
+                dueDate: { $lt: now },
+            })
+                .skip(skip)
+                .limit(parseInt(limit))
+                .sort({ createdAt: -1 });
+
+            total = await this.taskRepo.countDocuments({
+                ...filters,
+                dueDate: { $lt: now },
+            });
+        }
+
 
         return {
             tasks,
