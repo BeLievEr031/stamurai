@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 export function useAuth() {
     const router = useRouter();
     const { setUser } = useAuthStore();
-    const { data: selfData, refetch } = useQuery({
+    const { data: selfData, refetch, isLoading: selfLoading } = useQuery({
         queryKey: ['self'],
         queryFn: self,
         retry: false,
@@ -44,6 +44,7 @@ export function useAuth() {
         login: login.mutate,
         loginStatus: login.status,
         userData: selfData,
-        fetchUser: refetch
+        fetchUser: refetch,
+        selfLoading
     };
 }
