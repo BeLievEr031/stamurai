@@ -19,6 +19,9 @@ taskRouter.delete('/:id', authenticate, deleteTaskValidator, (req: Request, res:
 
 taskRouter.get('/', authenticate, paginationQueryValidator, (req: Request, res: Response, next: NextFunction) => taskController.get(req as PaginationRequest, res, next))
 
+taskRouter.get('/stat', authenticate, (req: Request, res: Response, next: NextFunction) => taskController.stat(req, res, next))
+
 taskRouter.get('/single-task/:id', authenticate, taskIdValidator, (req: Request, res: Response, next: NextFunction) => taskController.singleTask(req as DeleteTaskRequest, res, next))
+
 
 export default taskRouter;

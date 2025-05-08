@@ -5,6 +5,7 @@ import { validationResult } from "express-validator";
 import { HttpStatus } from "../utils/constant";
 import createHttpError from "http-errors";
 import logger from "../config/logger";
+import { Request } from "express-jwt";
 
 class TaksController {
     constructor(private taskService: TaskService) { }
@@ -98,6 +99,20 @@ class TaksController {
                 task
             })
 
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async stat(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userid } = req.auth as IPayload
+            const result = await this.taskService.stat(userid)
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: "Task statistics retrieved successfully",
+                stat: result[0],
+            });
         } catch (error) {
             next(error)
         }

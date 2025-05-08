@@ -134,6 +134,33 @@ class TaskServcie {
         };
     }
 
+    async stat(userid: string) {
+        return this.taskRepo.aggregate([
+            {
+                $facet: {
+                    assignedToMe: [
+                        { $match: { assignerid: { $exists: true } } },
+                        { $count: "count" }
+                    ],
+                    createdByMe: [
+                        { $match: { userid: userid, assignerid: { $exists: false } } },
+                        { $count: "count" }
+                    ],
+                    overdue: [
+                        { $match: { dueDate: { $lt: new Date() } } },
+                        { $count: "count" }
+                    ]
+                }
+            },
+            {
+                $project: {
+                    assignedToMe: { $ifNull: [{ $arrayElemAt: ["$assignedToMe.count", 0] }, 0] },
+                    createdByMe: { $ifNull: [{ $arrayElemAt: ["$createdByMe.count", 0] }, 0] },
+                    overdue: { $ifNull: [{ $arrayElemAt: ["$overdue.count", 0] }, 0] },
+                }
+            }
+        ]);
+    }
     async singleTask(userid: string, taskid: string) {
         return await this.taskRepo.findOne({ _id: taskid, userid })
     }
