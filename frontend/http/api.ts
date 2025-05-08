@@ -15,3 +15,5 @@ export const getTasks = async (query: IPagination) => api.get(`/task?title=${que
 export const getSingleTask = async (id: string) => api.get(`/task/single-task/${id}`)
 
 export const updateTask = async (task: { taskid: string, data: ITask }) => api.put(`/task/${task.taskid}`, task.data)
+
+export const getStat = async () => api.get("/task/stat")
