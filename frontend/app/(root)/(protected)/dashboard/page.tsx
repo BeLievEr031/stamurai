@@ -14,55 +14,13 @@ import TaskTable from "@/components/ui/TaskTable";
 const mockTasks = [
     {
         id: 1,
+        _id: "hjhjk",
         title: "Design login page",
         priority: "High",
         status: "In Progress",
         dueDate: "2024-06-10",
         avatar: "/avatar1.png",
     },
-    {
-        id: 2,
-        title: "Update API docs",
-        priority: "Medium",
-        status: "To Do",
-        dueDate: "2024-06-12",
-        avatar: "/avatar2.png",
-    },
-    {
-        id: 3,
-        title: "Fix bug #234",
-        priority: "High",
-        status: "Overdue",
-        dueDate: "2024-06-01",
-        avatar: "/avatar3.png",
-    },
-    {
-        id: 4,
-        title: "Fix bug #234",
-        priority: "High",
-        status: "Overdue",
-        dueDate: "2024-06-01",
-        avatar: "/avatar3.png",
-    },
-    {
-        id: 5,
-        title: "Fix bug #234",
-        priority: "High",
-        status: "Overdue",
-        dueDate: "2024-06-01",
-        avatar: "/avatar3.png",
-    },
-
-    {
-        id: 6,
-        title: "Fix bug #234",
-        priority: "High",
-        status: "Overdue",
-        dueDate: "2024-06-01",
-        avatar: "/avatar3.png",
-    },
-
-
 ];
 
 export default function DashboardPage() {

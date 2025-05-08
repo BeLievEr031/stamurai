@@ -103,6 +103,31 @@ class TaksController {
         }
     }
 
+    async singleTask(req: DeleteTaskRequest, res: Response, next: NextFunction) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
+                return;
+            }
+
+            const { userid } = req.auth as IPayload
+
+            const task = await this.taskService.singleTask(userid, req.params.id);
+            if (!task) {
+                next(createHttpError(HttpStatus.NOT_FOUND, "Invalid task-id."))
+                return;
+            }
+
+            res.status(HttpStatus.CREATED).json({
+                success: true,
+                message: "Task fetched successfully.",
+                task
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default TaksController;

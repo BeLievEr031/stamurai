@@ -129,6 +129,14 @@ export const deleteTaskValidator = checkSchema({
 })
 
 
+export const taskIdValidator = checkSchema({
+    id: {
+        in: ['params'],
+        isMongoId: true,
+        errorMessage: 'Valid Task ID is required',
+    },
+})
+
 export const paginationQueryValidator = checkSchema({
     page: {
         in: ['query'],
@@ -187,3 +195,4 @@ export const paginationQueryValidator = checkSchema({
         toDate: true,
     },
 });
+

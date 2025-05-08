@@ -6,6 +6,7 @@ import { TaskController } from "../../controllers/"
 import { Task } from "../../models";
 import { Request } from "express-jwt";
 import { AddTaskRequest, DeleteTaskRequest, EditTaskRequest, PaginationRequest } from "../../types";
+import { taskIdValidator } from "../../validators/taskValidator";
 const taskRouter = Router();
 const taskService = new TaskService(Task)
 const taskController = new TaskController(taskService);
@@ -17,5 +18,7 @@ taskRouter.put('/:id', authenticate, updateTaskValidator, (req: Request, res: Re
 taskRouter.delete('/:id', authenticate, deleteTaskValidator, (req: Request, res: Response, next: NextFunction) => taskController.delete(req as DeleteTaskRequest, res, next))
 
 taskRouter.get('/', authenticate, paginationQueryValidator, (req: Request, res: Response, next: NextFunction) => taskController.get(req as PaginationRequest, res, next))
+
+taskRouter.get('/single-task/:id', authenticate, taskIdValidator, (req: Request, res: Response, next: NextFunction) => taskController.singleTask(req as DeleteTaskRequest, res, next))
 
 export default taskRouter;

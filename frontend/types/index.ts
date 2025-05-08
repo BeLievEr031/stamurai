@@ -9,8 +9,8 @@ export interface ITask {
     title: string;
     description?: string;
     dueDate: Date;
-    priority: 'low' | 'medium' | 'high';
-    status: 'pending' | 'in-progress' | 'completed';
+    priority: string | 'low' | 'medium' | 'high';
+    status: string | 'pending' | 'in-progress' | 'completed';
     assignerid?: string
 }
 

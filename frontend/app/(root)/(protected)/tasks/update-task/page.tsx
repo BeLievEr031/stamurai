@@ -18,29 +18,51 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getSingleTask, updateTask } from "@/http/api";
+import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const taskSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
     description: z.string().min(5, "Description must be at least 5 characters").max(500),
     assignerid: z.string().min(1, "Assignee is required"),
     dueDate: z.date({ required_error: "Due date is required" }),
-    priority: z.enum(["low", "medium", "high"], {
-        errorMap: () => ({ message: "Priority is required" }),
-    }),
-    status: z.enum(["pending", "in-progress", "completed"], {
-        errorMap: () => ({ message: "Status is required" }),
-    }),
+    priority: z.string(),
+    status: z.string(),
 });
+
 
 type TaskFormValues = z.infer<typeof taskSchema>;
 
 export default function UpdateTask() {
+    const router = useRouter()
+    const { user } = useAuthStore();
     const searchParam = useSearchParams()
     const taskid = searchParam.get("taskid")
-    console.log(taskid);
+    const [taskData] = useState({
+        title: "",
+        description: "",
+        assignerid: "",
+        priority: "",
+        status: "",
+    })
 
-    // To backend call and fetch task data for update
+    const { data, isError, isLoading, error } = useQuery({
+        queryKey: ["single-task"],
+        queryFn: () => getSingleTask(taskid ? taskid : ""),
+
+    })
+    const { mutate } = useMutation({
+        mutationKey: ["update-task"],
+        mutationFn: updateTask,
+        onSuccess: () => {
+            router.push("/tasks")
+        }
+    })
+
 
     const form = useForm<TaskFormValues>({
         resolver: zodResolver(taskSchema),
@@ -48,16 +70,58 @@ export default function UpdateTask() {
             title: "",
             description: "",
             assignerid: "",
-            priority: "medium",
-            status: "pending",
+            priority: "",
+            status: "",
+            dueDate: undefined
         },
     });
+
+
+    useEffect(() => {
+        if (data?.data.task) {
+            const task = data.data.task;
+            form.reset({
+                title: task.title || "",
+                description: task.description || "",
+                assignerid: task.assignerid || "",
+                priority: task.priority,
+                status: task.status,
+                dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+            });
+        }
+    }, [taskid, data?.data.task, form]);
+
 
     // const [date, setDate] = useState<Date | undefined>(undefined);
 
     function onSubmit(data: TaskFormValues) {
-        console.log(data);
+        if (taskid && user?.userid) {
+
+            const newTaskData = {
+                taskid,
+                data: {
+                    userid: user.userid,
+                    ...taskData,
+                    ...data
+                }
+            }
+
+            mutate(newTaskData)
+        }
+
     }
+
+    if (isLoading) {
+        return <div>Loading</div>
+    }
+
+    if (isError) {
+        return <div>{error.message}</div>
+    }
+
+    // console.log(taskData);
+
+
 
     return (
         <div className="max-w-2xl mx-auto p-6">
@@ -114,8 +178,7 @@ export default function UpdateTask() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {/* {field.value ? format(field.value, "yyyy-MM-dd") : "Select date"} */}
-                                                        Select date
+                                                        {field.value ? format(field.value, "yyyy-MM-dd") : "Select date"}
                                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </FormControl>
@@ -126,6 +189,9 @@ export default function UpdateTask() {
                                                     selected={field.value}
                                                     onSelect={field.onChange}
                                                     initialFocus
+                                                    disabled={(date) =>
+                                                        date < new Date(new Date().setHours(0, 0, 0, 0)) // ✅ Block past days
+                                                    }
                                                 />
                                             </PopoverContent>
                                         </Popover>
@@ -140,7 +206,7 @@ export default function UpdateTask() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Priority</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Choose priority" />
@@ -164,7 +230,7 @@ export default function UpdateTask() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Status</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Set status" />

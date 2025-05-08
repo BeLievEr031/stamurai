@@ -134,6 +134,9 @@ class TaskServcie {
         };
     }
 
+    async singleTask(userid: string, taskid: string) {
+        return await this.taskRepo.findOne({ _id: taskid, userid })
+    }
 }
 
 export default TaskServcie;

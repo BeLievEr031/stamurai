@@ -136,11 +136,11 @@ export default function TasksPage() {
                         <SelectItem value="high">High</SelectItem>
                     </SelectContent>
                 </Select>
+
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button variant="outline" className="justify-start">
-                            {/* {selectedDate ? format(selectedDate, "yyyy-MM-dd") : "Any date"}
-                             */}
+
                             Any Date
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -149,6 +149,7 @@ export default function TasksPage() {
                         <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
                     </PopoverContent>
                 </Popover>
+
             </div>
 
             {/* Tabs and Tasks */}

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 
 import React from 'react'
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 interface Task {
     _id: string;
@@ -26,6 +27,7 @@ interface IProp {
 }
 
 function TaskTable({ task }: IProp) {
+    const router = useRouter();
     return (
         <div className="mt-4 rounded-md border">
             <Table>
@@ -53,7 +55,7 @@ function TaskTable({ task }: IProp) {
                             </TableCell>
                             <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
-                                    <Button size="icon" variant="ghost">
+                                    <Button size="icon" variant="ghost" className="cursor-pointer" onClick={() => router.push(`/tasks/update-task?taskid=${task._id}`)}>
                                         <PencilIcon className="w-4 h-4 cursor-pointer" />
                                     </Button>
                                     <Button size="icon" variant="ghost">
