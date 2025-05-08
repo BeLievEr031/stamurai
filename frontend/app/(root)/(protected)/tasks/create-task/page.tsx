@@ -17,12 +17,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { format } from "date-fns";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useTask } from "@/hooks/useTask";
 
 const taskSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
     description: z.string().min(5, "Description must be at least 5 characters").max(500),
-    assignerid: z.string().min(1, "Assignee is required"),
+    assignerid: z.string().optional(), // ✅ Optional
     dueDate: z.date({ required_error: "Due date is required" }),
     priority: z.enum(["low", "medium", "high"], {
         errorMap: () => ({ message: "Priority is required" }),
@@ -35,6 +44,8 @@ const taskSchema = z.object({
 type TaskFormValues = z.infer<typeof taskSchema>;
 
 export default function CreateTask() {
+    const { user } = useAuthStore();
+    const { createTaskMutate } = useTask();
     const form = useForm<TaskFormValues>({
         resolver: zodResolver(taskSchema),
         defaultValues: {
@@ -46,10 +57,11 @@ export default function CreateTask() {
         },
     });
 
-    // const [date, setDate] = useState<Date | undefined>(undefined);
-
     function onSubmit(data: TaskFormValues) {
-        console.log(data);
+        if (user?.userid) {
+            const task = { ...data, assignerid: user.userid, userid: user.userid, }
+            createTaskMutate(task)
+        }
     }
 
     return (
@@ -123,9 +135,7 @@ export default function CreateTask() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {/* {field.value ? format(field.value, "yyyy-MM-dd") : "Select date"} */}
-                                                        Select date
-
+                                                        {field.value ? format(field.value, "yyyy-MM-dd") : "Select date"}
                                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </FormControl>
@@ -136,6 +146,9 @@ export default function CreateTask() {
                                                     selected={field.value}
                                                     onSelect={field.onChange}
                                                     initialFocus
+                                                    disabled={(date) =>
+                                                        date < new Date(new Date().setHours(0, 0, 0, 0)) // ✅ Block past days
+                                                    }
                                                 />
                                             </PopoverContent>
                                         </Popover>
@@ -194,8 +207,12 @@ export default function CreateTask() {
                     </div>
 
                     <div className="flex gap-2 mt-6">
-                        <Button type="submit" className="bg-black text-white">Create Task</Button>
-                        <Button variant="ghost" type="button">Cancel</Button>
+                        <Button type="submit" className="bg-black text-white">
+                            Create Task
+                        </Button>
+                        <Button variant="ghost" type="button">
+                            Cancel
+                        </Button>
                     </div>
                 </form>
             </Form>
