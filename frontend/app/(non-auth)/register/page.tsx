@@ -2,7 +2,6 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
 import {
     Form,
     FormControl,
@@ -14,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 const registerSchema = z.object({
     email: z.string().min(1, 'Email is required').email('Invalid email format'),
@@ -24,7 +24,7 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function Register() {
-    const router = useRouter();
+    const { register } = useAuth();
     const form = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
@@ -35,14 +35,7 @@ export default function Register() {
     });
 
     const onSubmit = async (values: RegisterFormValues) => {
-        try {
-            // Simulate register API
-            console.log(values);
-            router.push('/login');
-        } catch (err) {
-            console.log(err);
-            form.setError('email', { type: 'manual', message: 'Email already exists' });
-        }
+        register(values)
     };
 
     return (
