@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
     LayoutDashboard,
@@ -12,13 +12,25 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/store/useAuthStore'
 
 export default function DashboardLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+
     const [collapsed, setCollapsed] = useState(false)
+    const router = useRouter()
+    const { user } = useAuthStore();
+
+    useEffect(() => {
+        console.log(user);
+        if (!user) {
+            router.push("/login")
+        }
+    }, [router, user])
 
     return (
         <div className="flex h-screen bg-gray-50">
@@ -27,6 +39,7 @@ export default function DashboardLayout({
                 "bg-white border-r transition-all duration-300 ease-in-out",
                 collapsed ? "w-20" : "w-64"
             )}>
+                <Link href={"/login"}>Login</Link>
                 <div className="flex flex-col h-full p-4">
                     {/* Logo */}
                     <div className="flex items-center justify-between mb-8">
