@@ -1,3 +1,4 @@
+import logger from "../config/logger";
 import { Task } from "../models";
 import { IPagination, ITask } from "../types";
 
@@ -32,7 +33,7 @@ class TaskServcie {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const filters: any = {};
-        filters._id = userid;
+        filters.userid = userid;
 
         if (title) {
             filters.title = { $regex: title, $options: 'i' }; // case-insensitive partial match
@@ -55,6 +56,7 @@ class TaskServcie {
         }
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
+        logger.info(JSON.stringify(filters))
         const tasks = await this.taskRepo.find(filters)
             .skip(skip)
             .limit(parseInt(limit))

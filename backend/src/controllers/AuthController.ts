@@ -91,10 +91,16 @@ class AuthController {
     async self(req: AuthenticateRequest, res: Response, next: NextFunction) {
         try {
             const user = await this.authService.self(req.auth?.userid)
+            const data = {
+                userid: user?._id,
+                email: user?.email,
+                role: user?.role,
+                name: user?.name
+            }
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: "User data fetched.",
-                user
+                user: data
             })
         } catch (error) {
             next(error)

@@ -174,9 +174,9 @@ export const paginationQueryValidator = checkSchema({
     dueData: {
         in: ['query'],
         optional: true,
-        isISO8601: {
-            errorMessage: 'Due date must be a valid ISO 8601 date string',
-        },
+        // isISO8601: {
+        //     errorMessage: 'Due date must be a valid ISO 8601 date string',
+        // },
         toDate: true,
     },
 });
