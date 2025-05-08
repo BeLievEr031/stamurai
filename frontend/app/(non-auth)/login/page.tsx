@@ -2,7 +2,6 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
 import {
     Form,
     FormControl,
@@ -14,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
     email: z.string().min(1, 'Email is required').email('Invalid email format'),
@@ -23,7 +23,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function Login() {
-    const router = useRouter();
+    const { login } = useAuth();
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -33,14 +33,7 @@ export default function Login() {
     });
 
     const onSubmit = async (values: LoginFormValues) => {
-        try {
-            // Simulate login API
-            console.log(values);
-            router.push('/dashboard');
-        } catch (err) {
-            console.log(err);
-            form.setError('email', { type: 'manual', message: 'Invalid credentials' });
-        }
+        login(values)
     };
 
     return (
