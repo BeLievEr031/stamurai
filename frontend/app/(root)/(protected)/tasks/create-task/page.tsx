@@ -62,7 +62,9 @@ export default function CreateTask() {
             if (data.assignerid === "") {
                 delete data.assignerid
             }
+
             const task = { ...data, userid: user.userid, }
+            console.log(task);
             createTaskMutate(task)
         }
     }

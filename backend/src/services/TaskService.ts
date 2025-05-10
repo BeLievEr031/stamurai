@@ -8,11 +8,50 @@ class TaskServcie {
     }
 
     async update(taskid: string, task: ITask) {
+        const {
+            userid,
+            title,
+            description,
+            dueDate,
+            priority,
+            status,
+            assignerid,
+        } = task;
+
+        if (assignerid) {
+            return await this.taskRepo.findByIdAndUpdate({ _id: taskid }, {
+                $set: {
+
+                    userid,
+                    title,
+                    description,
+                    dueDate,
+                    priority,
+                    status,
+                    assignerid,
+
+                }
+
+            }, {
+                new: true
+            })
+        }
+
         return await this.taskRepo.findByIdAndUpdate({ _id: taskid }, {
-            $set: task
+            $set: {
+
+                userid,
+                title,
+                description,
+                dueDate,
+                priority,
+                status,
+            }
+
         }, {
             new: true
         })
+
     }
 
     async delete(taskid: string) {

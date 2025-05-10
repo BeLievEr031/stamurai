@@ -19,6 +19,7 @@ export const addTaskValidator = checkSchema({
         in: ['body'],
         isString: true,
         trim: true,
+        optional: true
     },
 
     description: {
@@ -115,9 +116,9 @@ export const updateTaskValidator = checkSchema({
     assignerid: {
         in: ['body'],
         optional: true,
-        isMongoId: true,
-        errorMessage: 'Assigner ID must be a valid Mongo ID',
-    },
+        isString: true,
+        trim: true,
+    }
 });
 
 export const deleteTaskValidator = checkSchema({
