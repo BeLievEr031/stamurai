@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { NextFunction, Response } from "express";
 import { AuthService } from "../services";
-import { AuthRequest, IPayload } from "../types";
+import { AuthRequest, FetchUserRequest, IPayload } from "../types";
 import { validationResult } from "express-validator";
 import createHttpError from "http-errors";
 import { HttpStatus } from './../utils/constant';
@@ -167,6 +167,27 @@ class AuthController {
                 success: true,
                 message: 'Token refreshed successfully.',
             })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getUser(req: FetchUserRequest, res: Response, next: NextFunction) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
+                return;
+            }
+
+            const users = await this.authService.getUser(req.query);
+
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: "User fetched successfully.",
+                users
+            })
+
         } catch (error) {
             next(error)
         }

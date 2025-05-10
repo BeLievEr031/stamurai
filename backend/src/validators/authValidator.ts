@@ -65,3 +65,31 @@ export const loginValidator = checkSchema({
         },
     },
 });
+
+
+export const userPaginationValidator = checkSchema({
+    page: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            errorMessage: 'Page must be an integer',
+        },
+        toInt: true,
+    },
+    limit: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            errorMessage: 'Limit must be an integer',
+        },
+        toInt: true,
+    },
+    search: {
+        in: ['query'],
+        optional: true,
+        isString: {
+            errorMessage: 'Title must be a string',
+        },
+        trim: true,
+    },
+});

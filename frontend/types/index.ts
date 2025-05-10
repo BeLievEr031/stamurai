@@ -1,4 +1,5 @@
 export interface IUser {
+    _id?: string;
     name?: string;
     email: string;
     password: string;
@@ -23,4 +24,10 @@ export interface IPagination {
     priority?: string;
     dueData?: string;
     tab?: string;
+}
+
+export interface IUserQuery {
+    page: string;
+    limit: string;
+    search: string;
 }

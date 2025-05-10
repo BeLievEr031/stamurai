@@ -1,5 +1,5 @@
 import { RefreshToken, User } from "../models";
-import { IRefreshToken, IUser } from "../types";
+import { IRefreshToken, IUser, IUserQuery } from "../types";
 import { comparePassword } from "../utils";
 
 class AuthService {
@@ -42,6 +42,40 @@ class AuthService {
 
     async logout(userid: string) {
         return this.refreshTokenRepo.findOneAndDelete({ userid })
+    }
+
+    async getUser(query: IUserQuery) {
+        const {
+            limit = "10",
+            page = '1',
+            search
+        } = query;
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        let users = null;
+
+        let total = 0
+
+        users = await this.userRepo.find({
+            $or: [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }]
+        })
+            .skip(skip)
+            .limit(parseInt(limit))
+            .sort({ createdAt: -1 });
+
+        total = await this.userRepo.countDocuments({
+            $or: [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }]
+        });
+
+        return {
+            users,
+            pagination: {
+                total,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                pages: Math.ceil(total / parseInt(limit)),
+            },
+        };
     }
 }
 

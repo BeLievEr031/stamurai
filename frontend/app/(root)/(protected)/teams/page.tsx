@@ -1,35 +1,40 @@
 "use client";
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PencilIcon, TrashIcon, UserIcon, ChevronDownIcon } from "lucide-react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-
-const teamMembers = [
-    {
-        id: 1,
-        name: "Alex Morgan",
-        role: "Product Manager",
-        avatar: "/avatars/alex.png",
-    },
-    {
-        id: 2,
-        name: "Jamie Lee",
-        role: "Developer",
-        avatar: "/avatars/jamie.png",
-    },
-    {
-        id: 3,
-        name: "Morgan Yu",
-        role: "Designer",
-        avatar: "/avatars/morgan.png",
-    },
-];
+import { PencilIcon, } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getUser } from "@/http/api";
+import { IUser, IUserQuery } from "@/types";
+import { useDebounce } from 'use-debounce';
+import { useRouter } from "next/navigation";
 
 export default function TeamPage() {
-    const [search, setSearch] = useState("");
+    const router = useRouter();
+    const [pagination, setPagination] = useState<IUserQuery>({
+        limit: "10",
+        page: "1",
+        search: ""
+    })
+
+    const [value] = useDebounce(pagination.search, 1000);
+
+
+    const { data, isLoading, isError, error } = useQuery({
+        queryKey: ["fetch-users", pagination.page, pagination.limit, value],
+        queryFn: () => getUser({
+            ...pagination,
+            search: value
+        })
+    })
+
+    if (isLoading) {
+        return <div>Loading..</div>
+    }
+
+    if (isError) {
+        return <div>{error.message}</div>
+    }
 
     return (
         <div className="p-6 max-w-4xl mx-auto">
@@ -44,74 +49,36 @@ export default function TeamPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <Input
                         placeholder="Search by name or email"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        value={pagination.search}
+                        onChange={(e) => setPagination({ ...pagination, search: e.target.value })}
                         className="w-full"
                     />
-                    <Select>
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="All roles" />
-                            <UserIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All roles</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="developer">Developer</SelectItem>
-                            <SelectItem value="designer">Designer</SelectItem>
-                        </SelectContent>
-                    </Select>
                 </div>
 
-                <Tabs defaultValue="all">
-                    <TabsList>
-                        <TabsTrigger value="all">All</TabsTrigger>
-                        <TabsTrigger value="admins">Admins</TabsTrigger>
-                        <TabsTrigger value="members">Members</TabsTrigger>
-                    </TabsList>
+                <div>
 
-                    <TabsContent value="all" className="mt-4 space-y-4">
-                        {teamMembers.map((member) => (
-                            <div
-                                key={member.id}
-                                className="flex items-center justify-between border rounded-lg p-3"
-                            >
-                                <div className="flex items-center gap-4">
-                                    {/* <Avatar>
+                    {data?.data && data?.data.users.users.length > 0 && data?.data.users.users.map((member: IUser) => (
+                        <div
+                            key={member._id}
+                            className="flex mt-2 items-center justify-between border rounded-lg p-3"
+                        >
+                            <div className="flex items-center gap-4">
+                                {/* <Avatar>
                                         <AvatarImage src={member.avatar} alt={member.name} />
                                         <AvatarFallback>{member.name[0]}</AvatarFallback>
                                     </Avatar> */}
-                                    <div>
-                                        <p className="font-medium">{member.name}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {member.role}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Button size="icon" variant="ghost">
-                                        <PencilIcon className="h-4 w-4" />
-                                    </Button>
-                                    <Button size="icon" variant="ghost">
-                                        <TrashIcon className="h-4 w-4" />
-                                    </Button>
-                                    <Button variant="ghost" className="flex items-center gap-1 text-sm">
-                                        Select
-                                        <ChevronDownIcon className="w-4 h-4" />
-                                    </Button>
+                                <div>
+                                    <p className="font-medium">{member.name}</p>
+                                    <p className="font-medium">{member.email}</p>
                                 </div>
                             </div>
-                        ))}
-                    </TabsContent>
-
-                    <TabsContent value="admins">
-                        <p className="text-muted-foreground mt-4">Admins list goes here...</p>
-                    </TabsContent>
-
-                    <TabsContent value="members">
-                        <p className="text-muted-foreground mt-4">Members list goes here...</p>
-                    </TabsContent>
-                </Tabs>
+                            <Button size="icon" variant="ghost" className="cursor-pointer" onClick={() => router.push(`/tasks/create-task?memberid=${member._id}`)}>
+                                <PencilIcon className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                </div>
             </div>
-        </div>
+        </div >
     );
 }

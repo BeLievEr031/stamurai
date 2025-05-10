@@ -23,3 +23,16 @@ export interface IRefreshToken {
     token: string;
 }
 
+export interface IUserQuery {
+    limit: string;
+    page: string;
+    search: string
+}
+
+export interface FetchUserRequest extends Request {
+    query: {
+        limit: string;
+        page: string;
+        search: string
+    }
+}

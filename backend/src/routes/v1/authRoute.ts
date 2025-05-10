@@ -3,8 +3,8 @@ import { Request as AuthenticatRequest } from "express-jwt";
 import { AuthService } from "../../services";
 import { RefreshToken, User } from "../../models";
 import { AuthController } from "../../controllers";
-import { loginValidator, registerValidator } from "../../validators";
-import { AuthRequest } from "../../types";
+import { loginValidator, registerValidator, userPaginationValidator } from "../../validators";
+import { AuthRequest, FetchUserRequest } from "../../types";
 import authenticate from "../../middleware/authenticate";
 import validateRefreshToken from "../../middleware/validateRefreshToken";
 
@@ -21,5 +21,9 @@ authRouter.get("/self", authenticate, (req: AuthenticatRequest, res: Response, n
 authRouter.delete("/logout", authenticate, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.logout(req, res, next))
 
 authRouter.post("/refresh", validateRefreshToken, (req: AuthenticatRequest, res: Response, next: NextFunction) => authController.refresh(req, res, next))
+
+authRouter.get("/users", authenticate, userPaginationValidator, (req: FetchUserRequest, res: Response, next: NextFunction) => authController.getUser(req, res, next))
+
+
 export default authRouter;
 
