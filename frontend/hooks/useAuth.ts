@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { socket } from '@/http';
 import { loginUser, registerUser, self } from '@/http/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -31,6 +32,7 @@ export function useAuth() {
             const updatedSelfData = await refetch();
             setUser(updatedSelfData?.data?.data?.user)
             toast.success('Login successful');
+            socket.emit('register', updatedSelfData?.data?.data?.user?.userid);
             router.push("/dashboard")
         },
         onError: (err: any) => {

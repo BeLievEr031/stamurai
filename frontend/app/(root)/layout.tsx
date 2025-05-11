@@ -1,5 +1,6 @@
 'use client'
 import { useAuth } from '@/hooks/useAuth';
+import { socket } from '@/http';
 import { useAuthStore } from '@/store/useAuthStore'
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react'
@@ -13,10 +14,21 @@ function RootLayout({ children }: {
     useEffect(() => {
         async function fetchData() {
             const selfData = await fetchUser();
-            console.log(selfData?.data?.data.user);
             setUser(selfData?.data?.data.user);
+            socket.emit('register', selfData?.data?.data.user?.userid);
         }
         fetchData();
+
+        socket.on('task-assigned', (data) => {
+            console.log(data);
+
+            // alert(`New Task from ${data.assignerId}: ${data.title}`);
+        });
+
+        return () => {
+            socket.off('task-assigned');
+        };
+
     }, [fetchUser, setUser])
 
     useEffect(() => {

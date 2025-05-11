@@ -1,10 +1,20 @@
 import { Types } from "mongoose";
 import { Task } from "../models";
 import { IPagination, ITask } from "../types";
+import { io, onlineUsers } from "../server";
 
 class TaskServcie {
     constructor(private taskRepo: typeof Task) { }
     async add(task: ITask) {
+
+        if (task.assignerid) {
+            // Emit notification to assignee
+            const assigneeSocketId = onlineUsers.get(task.userid);
+            if (assigneeSocketId) {
+                io.to(assigneeSocketId).emit('task-assigned', task);
+            }
+        }
+
         return await this.taskRepo.create(task)
     }
 
@@ -168,6 +178,10 @@ class TaskServcie {
             tasks = await this.taskRepo.find({
                 ...filters,
                 dueDate: { $lt: now },
+                $or: [
+                    { assignerid: { $exists: false } },
+                    { assignerid: { $eq: null } }
+                ]
             })
                 .skip(skip)
                 .limit(parseInt(limit))
@@ -176,6 +190,10 @@ class TaskServcie {
             total = await this.taskRepo.countDocuments({
                 ...filters,
                 dueDate: { $lt: now },
+                $or: [
+                    { assignerid: { $exists: false } },
+                    { assignerid: { $eq: null } }
+                ]
             });
         }
 
@@ -204,7 +222,7 @@ class TaskServcie {
                         { $count: "count" }
                     ],
                     overdue: [
-                        { $match: { dueDate: { $lt: new Date() } } },
+                        { $match: { $and: [{ userid: new Types.ObjectId(userid) }, { dueDate: { $lt: new Date() } }] } },
                         { $count: "count" }
                     ]
                 }
