@@ -6,16 +6,15 @@ import { io, onlineUsers } from "../server";
 class TaskServcie {
     constructor(private taskRepo: typeof Task) { }
     async add(task: ITask) {
-
+        const newTask = await this.taskRepo.create(task)
         if (task.assignerid) {
             // Emit notification to assignee
             const assigneeSocketId = onlineUsers.get(task.userid);
             if (assigneeSocketId) {
-                io.to(assigneeSocketId).emit('task-assigned', task);
+                io.to(assigneeSocketId).emit('task-assigned', newTask);
             }
         }
-
-        return await this.taskRepo.create(task)
+        return newTask;
     }
 
     async update(taskid: string, task: ITask) {
@@ -237,7 +236,7 @@ class TaskServcie {
         ]);
     }
     async singleTask(userid: string, taskid: string) {
-        return await this.taskRepo.findOne({ _id: taskid, userid })
+        return await this.taskRepo.findOne({ _id: taskid, $or: [{ userid: new Types.ObjectId(userid) }, { assignerid: new Types.ObjectId(userid) }] })
     }
 }
 
