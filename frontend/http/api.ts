@@ -12,7 +12,7 @@ export const getUser = async (query: IUserQuery) => api.get(`/auth/users?search=
 // Api for the tasks
 export const createTask = async (data: ITask) => api.post("/task", data)
 
-export const getTasks = async (query: IPagination) => api.get(`/task?title=${query.title}&description=${query.description}&priority=${query.priority}&dueData=${query.dueData}&status=${query.status}&limit=${query.limit}&page=${query.page}&tab=${query.tab}`)
+export const getTasks = async (query: IPagination) => api.get(`/task?search=${query.search}&priority=${query.priority}&dueData=${query.dueData}&status=${query.status}&limit=${query.limit}&page=${query.page}&tab=${query.tab}`)
 
 export const getSingleTask = async (id: string) => api.get(`/task/single-task/${id}`)
 

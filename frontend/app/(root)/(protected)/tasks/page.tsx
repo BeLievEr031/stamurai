@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, FlagIcon, } from "lucide-react";
+import { FlagIcon } from "lucide-react";
 import { useState } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import TaskTable from "@/components/ui/TaskTable";
@@ -13,85 +11,30 @@ import { useRouter } from "next/navigation";
 import { IPagination } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { getTasks } from "@/http/api";
-
-// const mockTasks = [
-//     {
-//         id: 1,
-//         title: "Design login page",
-//         priority: "High",
-//         status: "In Progress",
-//         dueDate: "2024-06-10",
-//         avatar: "/avatar1.png",
-//     },
-//     {
-//         id: 2,
-//         title: "Update API docs",
-//         priority: "Medium",
-//         status: "To Do",
-//         dueDate: "2024-06-12",
-//         avatar: "/avatar2.png",
-//     },
-//     {
-//         id: 3,
-//         title: "Fix bug #234",
-//         priority: "High",
-//         status: "Overdue",
-//         dueDate: "2024-06-01",
-//         avatar: "/avatar3.png",
-//     },
-//     {
-//         id: 4,
-//         title: "Fix bug #234",
-//         priority: "High",
-//         status: "Overdue",
-//         dueDate: "2024-06-01",
-//         avatar: "/avatar3.png",
-//     },
-//     {
-//         id: 5,
-//         title: "Fix bug #234",
-//         priority: "High",
-//         status: "Overdue",
-//         dueDate: "2024-06-01",
-//         avatar: "/avatar3.png",
-//     },
-//     {
-//         id: 6,
-//         title: "Fix bug #234",
-//         priority: "High",
-//         status: "Overdue",
-//         dueDate: "2024-06-01",
-//         avatar: "/avatar3.png",
-//     },
-// ];
+import { useDebounce } from 'use-debounce';
 
 export default function TasksPage() {
     const router = useRouter();
-    const [selectedDate, setSelectedDate] = useState<Date>();
-    const [pagination, setPagination] = useState<IPagination>({
+
+    const [searchInput, setSearchInput] = useState('');
+    const [debouncedSearch] = useDebounce(searchInput, 1000);
+
+    const [pagination, setPagination] = useState<Omit<IPagination, 'search'>>({
         page: "1",
         limit: "20",
-        title: "",
-        description: "",
         dueData: "",
         priority: "all",
         status: "all",
         tab: "all"
     });
 
-    const { data, isLoading, isError, error } = useQuery({
-        queryKey: ["fetch-tasks", pagination],
-        queryFn: () => getTasks(pagination),
-    })
+    const { data, isError, error } = useQuery({
+        queryKey: ["fetch-tasks", pagination, debouncedSearch],
+        queryFn: () => getTasks({ ...pagination, search: debouncedSearch }),
+    });
 
-    if (isLoading) {
-        return <div>loading</div>
-    }
-
-    if (isError) {
-        return <div>{error.message}</div>
-    }
-
+    // if (isLoading) return <div>Loading...</div>;
+    if (isError) return <div>{error.message}</div>;
 
     return (
         <div className="p-6 space-y-6">
@@ -103,11 +46,14 @@ export default function TasksPage() {
 
             {/* Filters */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Input placeholder="Search by title or description" />
+                <Input
+                    placeholder="Search by title or description"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                />
 
-                <Select onValueChange={(value) => {
-                    setPagination({ ...pagination, status: value })
-                }}
+                <Select
+                    onValueChange={(value) => setPagination({ ...pagination, status: value })}
                     value={pagination.status}
                 >
                     <SelectTrigger>
@@ -121,9 +67,8 @@ export default function TasksPage() {
                     </SelectContent>
                 </Select>
 
-                <Select onValueChange={(value) => {
-                    setPagination({ ...pagination, priority: value })
-                }}
+                <Select
+                    onValueChange={(value) => setPagination({ ...pagination, priority: value })}
                     value={pagination.priority}
                 >
                     <SelectTrigger>
@@ -137,24 +82,12 @@ export default function TasksPage() {
                         <SelectItem value="high">High</SelectItem>
                     </SelectContent>
                 </Select>
-
-                {/* <Popover>
-                    <PopoverTrigger asChild>
-                        <Button variant="outline" className="justify-start">
-
-                            Any Date
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                        <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
-                    </PopoverContent>
-                </Popover> */}
-
             </div>
 
             {/* Tabs and Tasks */}
-            <Tabs defaultValue="all" value={pagination.tab}
+            <Tabs
+                defaultValue="all"
+                value={pagination.tab}
                 onValueChange={(value) => setPagination({ ...pagination, tab: value })}
             >
                 <TabsList className="mt-4">
@@ -164,22 +97,15 @@ export default function TasksPage() {
                     <TabsTrigger value="overdue">Overdue</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="p-2 text-xl font-semibold">
-                    {data?.data && data?.data.task.tasks.length > 0 ? <TaskTable task={data?.data.task.tasks} /> : "No task found here."}
-                </TabsContent>
-
-                <TabsContent value="assigned" className="p-2 text-xl font-semibold">
-                    {data?.data && data?.data.task.tasks.length > 0 ? <TaskTable task={data?.data.task.tasks} /> : "No task found here."}
-                </TabsContent>
-
-                <TabsContent value="created" className="p-2 text-xl font-semibold">
-                    {data?.data && data?.data.task.tasks.length > 0 ? <TaskTable task={data?.data.task.tasks} /> : "No task found here."}
-
-                </TabsContent>
-
-                <TabsContent value="overdue" className="p-2 text-xl font-semibold">
-                    {data?.data && data?.data.task.tasks.length > 0 ? <TaskTable task={data?.data.task.tasks} /> : "No task found here."}
-                </TabsContent>
+                {['all', 'assigned', 'created', 'overdue'].map((tab) => (
+                    <TabsContent key={tab} value={tab} className="p-2 text-xl font-semibold">
+                        {data?.data && data?.data.task.tasks.length > 0 ? (
+                            <TaskTable task={data.data.task.tasks} />
+                        ) : (
+                            "No task found here."
+                        )}
+                    </TabsContent>
+                ))}
             </Tabs>
         </div>
     );

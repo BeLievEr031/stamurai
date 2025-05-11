@@ -76,8 +76,7 @@ class TaskServcie {
         const {
             limit = '10',
             page = '1',
-            title,
-            description,
+            search,
             dueData,
             priority,
             status,
@@ -87,14 +86,6 @@ class TaskServcie {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const filters: any = {};
         filters.userid = userid;
-
-        if (title) {
-            filters.title = { $regex: title, $options: 'i' }; // case-insensitive partial match
-        }
-
-        if (description) {
-            filters.description = { $regex: description, $options: 'i' };
-        }
 
         if (priority && priority !== "all") {
             filters.priority = priority;
@@ -110,96 +101,120 @@ class TaskServcie {
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
         let tasks = null;
+        let total = 0;
 
-        let total = 0
-
+        const searchFilter = search
+            ? {
+                $or: [
+                    { title: { $regex: search, $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } }
+                ]
+            }
+            : {};
 
         if (tab === "all") {
-            delete filters.userid
-            tasks = await this.taskRepo.find({
-                ...filters,
-                $or: [
-                    { assignerid: new Types.ObjectId(userid) },
-                    { userid: new Types.ObjectId(userid) },
-                ]
-            })
-                .skip(skip)
-                .limit(parseInt(limit))
-                .sort({ createdAt: -1 });
-            total = await this.taskRepo.countDocuments(filters);
-        }
-
-        if (tab === "assigned") {
-            tasks = await this.taskRepo.find({
-                ...filters, $or: [
-                    { assignerid: { $exists: true } },
-                    { assignerid: { $ne: null } }
-                ]
-            })
-                .skip(skip)
-                .limit(parseInt(limit))
-                .sort({ createdAt: -1 });
-
-            total = await this.taskRepo.countDocuments({
-                ...filters, $or: [
-                    { assignerid: { $exists: true } },
-                    { assignerid: { $ne: null } }
-                ]
-            });
-        }
-
-        if (tab === 'created') {
-            delete filters.userid
-            tasks = await this.taskRepo.find({
-                ...filters, $or: [
-                    { assignerid: new Types.ObjectId(userid) },
+            delete filters.userid;
+            const baseQuery = {
+                $and: [
+                    filters,
+                    searchFilter,
                     {
-                        $and: [{ userid: new Types.ObjectId(userid) },
-                        {
-                            $or: [
-                                { assignerid: { $exists: false } },
-                                { assignerid: { $eq: null } }
-                            ]
-                        }
+                        $or: [
+                            { assignerid: new Types.ObjectId(userid) },
+                            { userid: new Types.ObjectId(userid) }
                         ]
                     }
                 ]
-            })
+            };
+
+            tasks = await this.taskRepo.find(baseQuery)
                 .skip(skip)
                 .limit(parseInt(limit))
                 .sort({ createdAt: -1 });
-            total = await this.taskRepo.countDocuments({
-                ...filters, $or: [
-                    { assignerid: { $exists: false } },
-                    { assignerid: null }
-                ]
-            });
+
+            total = await this.taskRepo.countDocuments(baseQuery);
         }
 
-        if (tab === 'overdue') {
+        if (tab === "assigned") {
+            const baseQuery = {
+                $and: [
+                    filters,
+                    searchFilter,
+                    {
+                        $or: [
+                            { assignerid: { $exists: true } },
+                            { assignerid: { $ne: null } }
+                        ]
+                    }
+                ]
+            };
+
+            tasks = await this.taskRepo.find(baseQuery)
+                .skip(skip)
+                .limit(parseInt(limit))
+                .sort({ createdAt: -1 });
+
+            total = await this.taskRepo.countDocuments(baseQuery);
+        }
+
+        if (tab === "created") {
+            delete filters.userid;
+
+            const baseQuery = {
+                $and: [
+                    filters,
+                    searchFilter,
+                    {
+                        $or: [
+                            { assignerid: new Types.ObjectId(userid) },
+                            {
+                                $and: [
+                                    { userid: new Types.ObjectId(userid) },
+                                    {
+                                        $or: [
+                                            { assignerid: { $exists: false } },
+                                            { assignerid: { $eq: null } }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            tasks = await this.taskRepo.find(baseQuery)
+                .skip(skip)
+                .limit(parseInt(limit))
+                .sort({ createdAt: -1 });
+
+            total = await this.taskRepo.countDocuments(baseQuery);
+        }
+
+        if (tab === "overdue") {
             const now = new Date();
-            tasks = await this.taskRepo.find({
-                ...filters,
-                dueDate: { $lt: now },
-                $or: [
-                    { assignerid: { $exists: false } },
-                    { assignerid: { $eq: null } }
+
+            const baseQuery = {
+                $and: [
+                    filters,
+                    searchFilter,
+                    { dueDate: { $lt: now } },
+                    {
+                        $or: [
+                            { assignerid: { $exists: false } },
+                            { assignerid: { $eq: null } }
+                        ]
+                    }
                 ]
-            })
+            };
+
+            tasks = await this.taskRepo.find(baseQuery)
                 .skip(skip)
                 .limit(parseInt(limit))
                 .sort({ createdAt: -1 });
 
-            total = await this.taskRepo.countDocuments({
-                ...filters,
-                dueDate: { $lt: now },
-                $or: [
-                    { assignerid: { $exists: false } },
-                    { assignerid: { $eq: null } }
-                ]
-            });
+            total = await this.taskRepo.countDocuments(baseQuery);
         }
-
 
         return {
             tasks,
@@ -211,6 +226,7 @@ class TaskServcie {
             },
         };
     }
+
 
     async stat(userid: string) {
         return this.taskRepo.aggregate([

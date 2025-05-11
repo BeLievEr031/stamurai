@@ -155,19 +155,11 @@ export const paginationQueryValidator = checkSchema({
         },
         toInt: true,
     },
-    title: {
+    search: {
         in: ['query'],
         optional: true,
         isString: {
-            errorMessage: 'Title must be a string',
-        },
-        trim: true,
-    },
-    description: {
-        in: ['query'],
-        optional: true,
-        isString: {
-            errorMessage: 'Description must be a string',
+            errorMessage: 'Search must be a string',
         },
         trim: true,
     },

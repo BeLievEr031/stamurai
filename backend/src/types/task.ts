@@ -30,8 +30,7 @@ export interface DeleteTaskRequest extends Request {
 export interface IPagination {
     page: string;
     limit: string;
-    title?: string;
-    description?: string;
+    search?: string;
     status?: string;
     priority?: string;
     dueData?: string;
@@ -42,8 +41,7 @@ export interface PaginationRequest extends Request {
     query: {
         page: string;
         limit: string;
-        title?: string;
-        description?: string;
+        search?: string;
         status?: string;
         priority?: string;
         dueData?: string;
