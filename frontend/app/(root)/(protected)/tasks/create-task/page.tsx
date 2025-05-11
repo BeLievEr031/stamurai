@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useTask } from "@/hooks/useTask";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const taskSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
@@ -47,7 +47,7 @@ type TaskFormValues = z.infer<typeof taskSchema>;
 export default function CreateTask() {
     const params = useSearchParams();
     const memberid = params.get("memberid")
-
+    const router = useRouter();
     const { user } = useAuthStore();
     const { createTaskMutate } = useTask();
     const form = useForm<TaskFormValues>({
@@ -226,7 +226,7 @@ export default function CreateTask() {
                         <Button type="submit" className="bg-black text-white">
                             Create Task
                         </Button>
-                        <Button variant="ghost" type="button">
+                        <Button variant="ghost" type="button" onClick={() => router.push("/tasks")}>
                             Cancel
                         </Button>
                     </div>
