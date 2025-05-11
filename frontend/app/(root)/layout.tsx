@@ -2,6 +2,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { socket } from '@/http';
 import { useAuthStore } from '@/store/useAuthStore'
+import { useNotificationStore } from '@/store/useNotificationStore';
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react'
 
@@ -11,6 +12,7 @@ function RootLayout({ children }: {
     const router = useRouter();
     const { user, setUser } = useAuthStore();
     const { fetchUser, selfLoading } = useAuth();
+    const { setNotification } = useNotificationStore();
     useEffect(() => {
         async function fetchData() {
             const selfData = await fetchUser();
@@ -21,7 +23,7 @@ function RootLayout({ children }: {
 
         socket.on('task-assigned', (data) => {
             console.log(data);
-
+            setNotification(data)
             // alert(`New Task from ${data.assignerId}: ${data.title}`);
         });
 

@@ -17,6 +17,8 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useMutation } from '@tanstack/react-query'
 import { logout } from '@/http/api'
+import { Badge } from '@/components/ui/badge'
+import { useNotificationStore } from '@/store/useNotificationStore'
 
 export default function DashboardLayout({
     children,
@@ -27,7 +29,7 @@ export default function DashboardLayout({
     const [collapsed, setCollapsed] = useState(false)
     const router = useRouter()
     const { user, logout: userLogout } = useAuthStore();
-
+    const { notification } = useNotificationStore();
     useEffect(() => {
         console.log(user);
         if (!user) {
@@ -91,13 +93,23 @@ export default function DashboardLayout({
                             {!collapsed && <span>Team</span>}
                         </Link>
 
-                        <Link href="/dashboard/notifications" className={cn(
-                            "flex items-center p-3 rounded-lg hover:bg-blue-50",
-                            collapsed ? "justify-center" : "space-x-3"
-                        )}>
-                            <Bell className="text-gray-600" size={20} />
-                            {!collapsed && <span>Notifications</span>}
+                        <Link
+                            href="/notification"
+                            className={cn(
+                                "flex items-center justify-between p-3 rounded-lg hover:bg-blue-100 transition-colors",
+                                collapsed ? "justify-center" : "space-x-3"
+                            )}
+                        >
+                            <div className={cn("flex items-center", collapsed ? "justify-center w-full" : "space-x-3")}>
+                                <Bell className="text-gray-600" size={20} />
+                                {!collapsed && <span className="text-gray-700 font-medium">Notifications</span>}
+                            </div>
+
+                            {notification.length > 0 && <Badge variant="destructive" className="ml-auto h-5 w-5 text-sm">
+                                {notification.length}
+                            </Badge>}
                         </Link>
+
                     </nav>
 
                     {/* Profile */}
