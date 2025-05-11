@@ -15,6 +15,9 @@ export const createTask = async (data: ITask) => api.post("/task", data)
 export const getTasks = async (query: IPagination) => api.get(`/task?title=${query.title}&description=${query.description}&priority=${query.priority}&dueData=${query.dueData}&status=${query.status}&limit=${query.limit}&page=${query.page}&tab=${query.tab}`)
 
 export const getSingleTask = async (id: string) => api.get(`/task/single-task/${id}`)
+
+export const deleteTask = async (id: string) => api.delete(`/task/${id}`)
+
 export const updateTask = async (task: { taskid: string, data: ITask }) => api.put(`/task/${task.taskid}`, task.data)
 
 export const getStat = async () => api.get("/task/stat")

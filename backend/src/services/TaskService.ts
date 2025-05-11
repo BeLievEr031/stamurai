@@ -68,8 +68,8 @@ class TaskServcie {
 
     }
 
-    async delete(taskid: string) {
-        return await this.taskRepo.findByIdAndDelete({ _id: taskid })
+    async delete(userid: string, taskid: string) {
+        return await this.taskRepo.findOneAndDelete({ userid: new Types.ObjectId(userid), _id: taskid })
     }
 
     async get(userid: string, query: IPagination) {

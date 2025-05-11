@@ -66,7 +66,7 @@ class TaksController {
             }
 
             const { id } = req.params
-            const isDeleted = await this.taskService.delete(id)
+            const isDeleted = await this.taskService.delete(req.auth?.userid, id)
             if (!isDeleted) {
                 next(createHttpError(HttpStatus.BAD_REQUEST, "Invalid task."))
                 return;

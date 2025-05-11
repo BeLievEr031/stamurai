@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -137,7 +138,7 @@ export default function TasksPage() {
                     </SelectContent>
                 </Select>
 
-                <Popover>
+                {/* <Popover>
                     <PopoverTrigger asChild>
                         <Button variant="outline" className="justify-start">
 
@@ -148,7 +149,7 @@ export default function TasksPage() {
                     <PopoverContent className="w-auto p-0">
                         <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
                     </PopoverContent>
-                </Popover>
+                </Popover> */}
 
             </div>
 

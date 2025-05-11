@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import React from 'react'
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteTask } from "@/http/api";
 
 interface Task {
     _id: string;
@@ -30,7 +32,15 @@ interface IProp {
 
 function TaskTable({ task }: IProp) {
     const router = useRouter();
-
+    const query = useQueryClient();
+    const { mutate } = useMutation({
+        mutationKey: ["delete-task"],
+        mutationFn: deleteTask,
+        onSuccess: () => {
+            console.log("task deleted successfully.");
+            query.invalidateQueries({ queryKey: ["fetch-tasks"] })
+        }
+    })
     return (
         <div className="mt-4">
             {/* Desktop Table */}
@@ -66,7 +76,9 @@ function TaskTable({ task }: IProp) {
                                         <Button size="icon" variant="ghost" onClick={() => router.push(`/tasks/update-task?taskid=${task._id}`)}>
                                             <PencilIcon className="w-4 h-4" />
                                         </Button>
-                                        <Button size="icon" variant="ghost">
+                                        <Button size="icon" variant="ghost" className="cursor-pointer" onClick={() => {
+                                            mutate(task._id)
+                                        }}>
                                             <TrashIcon className="w-4 h-4" />
                                         </Button>
                                     </div>
@@ -95,13 +107,16 @@ function TaskTable({ task }: IProp) {
                             Due: {format(task.dueDate, 'MMMM dd, yyyy')}
                         </div>
                         <div className="flex justify-end gap-2">
-                            <Button size="icon" variant="ghost" onClick={() => router.push(`/tasks/view-task/${task._id}`)}>
+                            <Button size="icon" variant="ghost" className="cursor-pointer" onClick={() => router.push(`/tasks/view-task/${task._id}`)}>
                                 <Eye className="w-4 h-4" />
                             </Button>
                             <Button size="icon" variant="ghost" onClick={() => router.push(`/tasks/update-task?taskid=${task._id}`)}>
                                 <PencilIcon className="w-4 h-4" />
                             </Button>
-                            <Button size="icon" variant="ghost">
+                            <Button size="icon" variant="secondary" className="cursor-pointer" onClick={() => {
+                                mutate(task._id)
+                            }}>
+
                                 <TrashIcon className="w-4 h-4" />
                             </Button>
                         </div>
