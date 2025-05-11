@@ -28,3 +28,22 @@ export const notificationValidator = checkSchema({
         toBoolean: true, // Converts the value to boolean
     },
 });
+
+export const notificationPaginationValidator = checkSchema({
+    page: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            errorMessage: 'Page must be an integer',
+        },
+        toInt: true,
+    },
+    limit: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            errorMessage: 'Limit must be an integer',
+        },
+        toInt: true,
+    }
+})

@@ -2,11 +2,56 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { getStat } from "@/http/api";
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 export default function DashboardPage() {
     const { data } = useQuery({
         queryKey: ['get-stat'],
         queryFn: getStat
     })
+
+
+    const stat = {
+        assignedToMe: data?.data.stat.assignedToMe || 0,
+        createdByMe: data?.data.stat.createdByMe || 0,
+        overdue: data?.data.stat.overdue || 0,
+    };
+
+    const graphData = {
+        labels: ['Assigned To Me', 'Created By Me', 'Overdue'],
+        datasets: [
+            {
+                label: 'Task Statistics',
+                data: [stat.assignedToMe, stat.createdByMe, stat.overdue],
+                backgroundColor: ['#3b82f6', '#10b981', '#ef4444'],
+                borderRadius: 8,
+            },
+        ],
+    };
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: true,
+                text: 'Task Overview',
+                font: { size: 20 },
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                },
+            },
+        },
+    };
 
     return (
         <div className="p-6 space-y-6 h-screen overflow-scroll">
@@ -34,7 +79,9 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
             </div>
-
+            <div className="max-w-3xl mt-20 bg-white p-6">
+                <Bar data={graphData} options={options} />
+            </div>
         </div >
 
     );

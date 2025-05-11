@@ -3,12 +3,12 @@ import authenticate from "../../middleware/authenticate";
 import { addTaskValidator, deleteTaskValidator, paginationQueryValidator, updateTaskValidator } from "../../validators";
 import { TaskService } from "../../services";
 import { TaskController } from "../../controllers/"
-import { Task } from "../../models";
+import { Notification, Task } from "../../models";
 import { Request } from "express-jwt";
 import { AddTaskRequest, DeleteTaskRequest, EditTaskRequest, PaginationRequest } from "../../types";
 import { taskIdValidator } from "../../validators/taskValidator";
 const taskRouter = Router();
-const taskService = new TaskService(Task)
+const taskService = new TaskService(Task, Notification)
 const taskController = new TaskController(taskService);
 
 taskRouter.post('/', authenticate, addTaskValidator, (req: Request, res: Response, next: NextFunction) => taskController.add(req as AddTaskRequest, res, next))

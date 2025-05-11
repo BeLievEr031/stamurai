@@ -31,3 +31,8 @@ export interface IUserQuery {
     limit: string;
     search: string;
 }
+
+export interface INotificationQuery {
+    page: string;
+    limit: string;
+}

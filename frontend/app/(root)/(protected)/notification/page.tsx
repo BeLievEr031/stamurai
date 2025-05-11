@@ -12,7 +12,8 @@ export default function NotificationPage() {
 
             <div className="space-y-6">
                 {
-                    notifications.map((notification, index) => {
+                    notifications.length > 0 && notifications.map((notification, index) => {
+                        console.log(notification);
                         return <div key={index}>
                             <div className="flex justify-between items-start">
                                 <div className="flex space-x-3">
@@ -20,9 +21,9 @@ export default function NotificationPage() {
                                         <ClipboardList size={20} className="text-gray-600" />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-800">Task assigned: {notification.title}</p>
+                                        <p className="font-medium text-gray-800">Task assigned: {notification.taskid?.title}</p>
                                         <p className="text-gray-500 text-sm">
-                                            You were assigned a task • {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                                            You were assigned a task • {formatDistanceToNow(new Date("2025-05-11T13:07:46.879Z"), { addSuffix: true })}
                                         </p>
                                     </div>
                                 </div>

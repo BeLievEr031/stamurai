@@ -12,3 +12,14 @@ export interface NotificationRequest extends Request {
     body: INotification
 }
 
+export interface INotificationQuery {
+    page: string;
+    limit: string;
+}
+
+export interface GetNotificationRequest extends Request {
+    query: {
+        page: string;
+        limit: string;
+    }
+}

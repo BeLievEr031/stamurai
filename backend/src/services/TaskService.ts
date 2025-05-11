@@ -1,10 +1,10 @@
 import { Types } from "mongoose";
-import { Task } from "../models";
+import { Notification, Task } from "../models";
 import { IPagination, ITask } from "../types";
 import { io, onlineUsers } from "../server";
 
 class TaskServcie {
-    constructor(private taskRepo: typeof Task) { }
+    constructor(private taskRepo: typeof Task, private notificationRepo: typeof Notification) { }
     async add(task: ITask) {
         const newTask = await this.taskRepo.create(task)
         if (task.assignerid) {
@@ -12,6 +12,10 @@ class TaskServcie {
             const assigneeSocketId = onlineUsers.get(task.userid);
             if (assigneeSocketId) {
                 io.to(assigneeSocketId).emit('task-assigned', newTask);
+                await this.notificationRepo.create({
+                    taskid: newTask._id,
+                    userid: newTask.userid
+                });
             }
         }
         return newTask;
