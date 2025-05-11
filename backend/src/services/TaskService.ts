@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Task } from "../models";
 import { IPagination, ITask } from "../types";
 
@@ -101,7 +102,14 @@ class TaskServcie {
 
 
         if (tab === "all") {
-            tasks = await this.taskRepo.find(filters)
+            delete filters.userid
+            tasks = await this.taskRepo.find({
+                ...filters,
+                $or: [
+                    { assignerid: new Types.ObjectId(userid) },
+                    { userid: new Types.ObjectId(userid) },
+                ]
+            })
                 .skip(skip)
                 .limit(parseInt(limit))
                 .sort({ createdAt: -1 });
@@ -128,10 +136,20 @@ class TaskServcie {
         }
 
         if (tab === 'created') {
+            delete filters.userid
             tasks = await this.taskRepo.find({
                 ...filters, $or: [
-                    { assignerid: { $exists: false } },
-                    { assignerid: null }
+                    { assignerid: new Types.ObjectId(userid) },
+                    {
+                        $and: [{ userid: new Types.ObjectId(userid) },
+                        {
+                            $or: [
+                                { assignerid: { $exists: false } },
+                                { assignerid: { $eq: null } }
+                            ]
+                        }
+                        ]
+                    }
                 ]
             })
                 .skip(skip)
@@ -178,11 +196,11 @@ class TaskServcie {
             {
                 $facet: {
                     assignedToMe: [
-                        { $match: { assignerid: { $exists: true } } },
+                        { $match: { userid: new Types.ObjectId(userid), assignerid: { $exists: true } } },
                         { $count: "count" }
                     ],
                     createdByMe: [
-                        { $match: { userid: userid, assignerid: { $exists: false } } },
+                        { $match: { $or: [{ userid: new Types.ObjectId(userid), assignerid: { $exists: false } }, { assignerid: new Types.ObjectId(userid) }] } },
                         { $count: "count" }
                     ],
                     overdue: [

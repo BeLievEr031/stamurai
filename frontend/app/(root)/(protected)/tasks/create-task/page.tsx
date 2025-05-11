@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useTask } from "@/hooks/useTask";
+import { useSearchParams } from "next/navigation";
 
 const taskSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
@@ -44,6 +45,9 @@ const taskSchema = z.object({
 type TaskFormValues = z.infer<typeof taskSchema>;
 
 export default function CreateTask() {
+    const params = useSearchParams();
+    const memberid = params.get("memberid")
+
     const { user } = useAuthStore();
     const { createTaskMutate } = useTask();
     const form = useForm<TaskFormValues>({
@@ -58,6 +62,13 @@ export default function CreateTask() {
     });
 
     function onSubmit(data: TaskFormValues) {
+        if (memberid && user) {
+            const task = { ...data, userid: memberid, assignerid: user.userid, }
+            console.log(task);
+            createTaskMutate(task)
+            return;
+        }
+
         if (user?.userid) {
             if (data.assignerid === "") {
                 delete data.assignerid
@@ -107,7 +118,7 @@ export default function CreateTask() {
                         />
 
                         <div className="grid grid-cols-2 gap-4 mt-6">
-                            <FormField
+                            {memberid && <FormField
                                 control={form.control}
                                 name="assignerid"
                                 render={({ field }) => (
@@ -115,14 +126,14 @@ export default function CreateTask() {
                                         <FormLabel>Assignee</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Input placeholder="Select team member" {...field} />
+                                                <Input placeholder="Select team member" {...field} value={user?.userid} readOnly />
                                                 <UserIcon className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
+                            />}
 
                             <FormField
                                 control={form.control}
