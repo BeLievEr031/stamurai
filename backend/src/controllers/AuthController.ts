@@ -69,14 +69,14 @@ class AuthController {
                 httpOnly: true,
                 maxAge: 1000 * 60 * 60,
                 secure: true,
-                sameSite: "strict"
+                sameSite: "none"
             })
 
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
                 maxAge: 1000 * 60 * 60 * 24 * 7,
                 secure: true,
-                sameSite: "strict"
+                sameSite: "none"
             })
 
             res.status(HttpStatus.OK).json({
@@ -153,14 +153,14 @@ class AuthController {
                 httpOnly: true,
                 maxAge: 1000 * 60 * 60,
                 secure: true,
-                sameSite: "strict"
+                sameSite: "none"
             })
 
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
                 maxAge: 1000 * 60 * 60 * 24 * 7,
                 secure: true,
-                sameSite: "strict"
+                sameSite: "none"
             })
 
             res.status(HttpStatus.OK).json({
