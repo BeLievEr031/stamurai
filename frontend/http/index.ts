@@ -1,11 +1,11 @@
 import axios from "axios"
 import { io } from "socket.io-client";
 const api = axios.create({
-    baseURL: `http://localhost:5000/api/v1`,
+    baseURL: `https://stamurai-il1u.onrender.com/api/v1`,
     withCredentials: true
 })
 
-const socket = io('http://localhost:5000', {
+const socket = io('https://stamurai-il1u.onrender.com', {
     autoConnect: true,
     transports: ['websocket'],
     withCredentials: true,
