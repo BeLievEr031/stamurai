@@ -66,7 +66,7 @@ function TaskTable({ task }: IProp) {
                                 </TableCell>
                                 <TableCell className="capitalize">{task.status}</TableCell>
                                 <TableCell>
-                                    {format(task.dueDate, 'MMMM dd, yyyy')}
+                                    {format(new Date(task.dueDate), 'MMMM dd, yyyy')}
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">
@@ -104,7 +104,7 @@ function TaskTable({ task }: IProp) {
                             Status: {task.status}
                         </div>
                         <div className="text-sm mb-3">
-                            Due: {format(task.dueDate, 'MMMM dd, yyyy')}
+                            Due: {format(new Date(task.dueDate), 'MMMM dd, yyyy')}
                         </div>
                         <div className="flex justify-end gap-2">
                             <Button size="icon" variant="ghost" className="cursor-pointer" onClick={() => router.push(`/tasks/view-task/${task._id}`)}>
